@@ -1,6 +1,6 @@
 # MCP SAP Docs (Upstream)
 
-An MCP server that gives AI assistants (Claude, Cursor, ChatGPT, etc.) access to SAP documentation through a unified search and fetch interface. It combines a local full-text + semantic index over git-cloned SAP docs with optional live queries to SAP Help, SAP Community, and Software Heroes — all exposed as MCP tools.
+An MCP server that gives AI assistants (Claude, Cursor, ChatGPT, etc.) access to SAP documentation through a unified search and fetch interface. It combines a local full-text + semantic index over git-cloned SAP docs with optional live queries to SAP Help, SAP Community, Software Heroes, SAP Business Accelerator Hub, and SAP Fiori App Reference Library — all exposed as MCP tools.
 
 ## Local Setup & Configuration
 
@@ -77,6 +77,8 @@ Add the following to your MCP client's configuration file (e.g., `mcp_config.jso
 | SAP Help Portal | Official SAP product documentation (broad scope) |
 | SAP Community | Community blogs, Q&A, and troubleshooting posts |
 | Software Heroes | ABAP/RAP articles and tutorials (EN + DE, deduplicated) |
+| SAP Business Accelerator Hub | Official standard SAP APIs (OData, REST, SOAP), Events, and Integrations |
+| SAP Fiori App Reference Library | Official repository of all SAP Fiori apps, technical catalogs, and configuration details |
 
 ## Available Tools
 
