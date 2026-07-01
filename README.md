@@ -81,16 +81,16 @@ mcp-sap-docs/
         "@modelcontextprotocol/supergateway",
         "--stdio",
         "--url",
-        "https://sap-docs-extend-mcp.cfapps.<region>.hana.ondemand.com/sse",
+        "https://sap-docs-extend-mcp.cfapps.ap21.hana.ondemand.com/sse",
         "--header",
-        "SAP-API-HUB-KEY: <YOUR_API_KEY_HERE>"
+        "SAP-API-HUB-KEY: <YOUR_API_KEY_HERE>" 
       ],
-      "disabled": false,
-      "autoApprove": []
+      "disabled": false
     }
   }
 }
 ```
+*(Note: `SAP-API-HUB-KEY` is **optional**. If omitted, the `sap_accelerator_hub_*` tools will be restricted from fetching API data, but all other tools like Offline Search, Fiori Library, and Clean Core Objects will still work normally.)*
 
 ## 🔗 References
 
