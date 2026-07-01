@@ -4,7 +4,7 @@ import { CONFIG } from "../config.js";
 
 const API_HUB_BASE_URL = "https://api.sap.com/odata/1.0/catalog.svc";
 
-export async function fetchAcceleratorHubApi(id: string): Promise<string> {
+export async function fetchAcceleratorHubApi(id: string, apiKey?: string): Promise<string> {
   const url = new URL(`${API_HUB_BASE_URL}/APIContent.APIs('${id}')`);
   url.searchParams.append("$format", "json");
 
@@ -15,8 +15,9 @@ export async function fetchAcceleratorHubApi(id: string): Promise<string> {
       "Accept": "application/json"
     };
 
-    if (process.env.SAP_API_HUB_KEY) {
-      headers["APIKey"] = process.env.SAP_API_HUB_KEY;
+    const effectiveKey = apiKey || process.env.SAP_API_HUB_KEY;
+    if (effectiveKey) {
+      headers["APIKey"] = effectiveKey;
     }
 
     const response = await fetch(url.toString(), {

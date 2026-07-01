@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+import { PROJECT_ROOT } from "./projectRoot.js";
 
 export interface VariantToolFlags {
   abapLint: boolean;
@@ -36,7 +37,6 @@ export interface VariantConfig {
 
 const DEFAULT_VARIANT = "sap-docs";
 const VARIANT_SELECTOR_FILE = ".mcp-variant";
-const PROJECT_ROOT = path.resolve(__dirname, "..", "..", "..");
 const VARIANT_DIR = path.resolve(PROJECT_ROOT, "config", "variants");
 
 let cachedVariantName: string | null = null;

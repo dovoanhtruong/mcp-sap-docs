@@ -1,10 +1,7 @@
 import { getVariantConfig } from "./variant.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const PROJECT_ROOT = path.resolve(__dirname, "..", "..", "..");
+import { PROJECT_ROOT } from "./projectRoot.js";
 
 const variant = getVariantConfig();
 

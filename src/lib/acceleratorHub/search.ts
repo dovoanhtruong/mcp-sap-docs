@@ -7,10 +7,11 @@ const API_HUB_BASE_URL = "https://api.sap.com/odata/1.0/catalog.svc";
 export interface AcceleratorHubSearchOptions {
   query: string;
   top?: number;
+  apiKey?: string;
 }
 
 export async function searchAcceleratorHub(options: AcceleratorHubSearchOptions): Promise<AcceleratorHubSearchResult[]> {
-  const { query, top = 50 } = options;
+  const { query, top = 50, apiKey } = options;
   const url = new URL(`${API_HUB_BASE_URL}/APIContent.APIs`);
   
   const safeQuery = query.replace(/'/g, "''");
@@ -29,8 +30,9 @@ export async function searchAcceleratorHub(options: AcceleratorHubSearchOptions)
       "Accept": "application/json"
     };
 
-    if (process.env.SAP_API_HUB_KEY) {
-      headers["APIKey"] = process.env.SAP_API_HUB_KEY;
+    const effectiveKey = apiKey || process.env.SAP_API_HUB_KEY;
+    if (effectiveKey) {
+      headers["APIKey"] = effectiveKey;
     }
 
     const response = await fetch(urlString, {

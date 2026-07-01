@@ -234,8 +234,8 @@ export class BaseServerHandler {
   /**
    * Configure server with tool handlers
    */
-  static configureServer(srv: Server): void {
-    this.setupToolHandlers(srv);
+  static configureServer(srv: Server, context?: Record<string, any>): void {
+    this.setupToolHandlers(srv, context);
 
     const capabilities = (srv as unknown as { _capabilities?: { prompts?: object; resources?: object } })._capabilities;
     if (capabilities?.prompts) {
@@ -249,7 +249,7 @@ export class BaseServerHandler {
   /**
    * Setup tool handlers for ABAP/RAP-focused MCP server
    */
-  private static setupToolHandlers(srv: Server): void {
+  private static setupToolHandlers(srv: Server, context?: Record<string, any>): void {
     // List available tools
     srv.setRequestHandler(ListToolsRequestSchema, async () => {
       const response = {
@@ -1929,7 +1929,11 @@ RETURNS (JSON):
         const { query, k } = args as { query: string; k?: number };
         const timing = logger.logToolStart(name, query, clientMetadata);
         try {
-          const results = await searchAcceleratorHub({ query, top: k });
+          const apiKey = context?.sapApiHubKey || process.env.SAP_API_HUB_KEY;
+          if (!apiKey) {
+            return createEmptySearchResponse(`Error: SAP_API_HUB_KEY is required for Accelerator Hub features. Please provide it in your client configuration (e.g. -h "SAP-API-HUB-KEY: xxxx").`, timing.requestId);
+          }
+          const results = await searchAcceleratorHub({ query, top: k, apiKey });
           logger.logToolSuccess(name, timing.requestId, timing.startTime, results.length);
           return createSearchResponse(results);
         } catch (error) {
@@ -1942,7 +1946,11 @@ RETURNS (JSON):
         const { id } = args as { id: string };
         const timing = logger.logToolStart(name, id, clientMetadata);
         try {
-          const content = await fetchAcceleratorHubApi(id);
+          const apiKey = context?.sapApiHubKey || process.env.SAP_API_HUB_KEY;
+          if (!apiKey) {
+            return createErrorResponse(`Error: SAP_API_HUB_KEY is required for Accelerator Hub features. Please provide it in your client configuration (e.g. -h "SAP-API-HUB-KEY: xxxx").`, timing.requestId);
+          }
+          const content = await fetchAcceleratorHubApi(id, apiKey);
           logger.logToolSuccess(name, timing.requestId, timing.startTime, 1);
           return createDocumentResponse({
             id,

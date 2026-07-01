@@ -13,16 +13,18 @@ export function getProjectRoot(): string {
     return projectRoot;
   }
 
-  let current = __dirname;
-  while (current !== path.dirname(current)) {
-    if (fs.existsSync(path.join(current, "package.json"))) {
-      projectRoot = current;
-      return projectRoot;
+  // Determine project root dynamically based on whether we are running in dist/
+  let root = process.cwd();
+  if (root.includes('dist') || !fs.existsSync(path.join(root, 'package.json'))) {
+    while (root.includes('dist') || !fs.existsSync(path.join(root, 'package.json'))) {
+      if (root === path.dirname(root)) break;
+      root = path.dirname(root);
     }
-    current = path.dirname(current);
   }
-
-  projectRoot = path.resolve(__dirname, "../../..");
+  if (!fs.existsSync(path.join(root, 'package.json'))) {
+    root = path.resolve(__dirname, "../../..");
+  }
+  projectRoot = root;
   return projectRoot;
 }
 

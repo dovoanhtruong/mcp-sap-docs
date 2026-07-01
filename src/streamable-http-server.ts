@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import cors from "cors";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import {
   isInitializeRequest
 } from "@modelcontextprotocol/sdk/types.js";
@@ -60,7 +61,7 @@ class InMemoryEventStore {
   }
 }
 
-function createServer() {
+function createServer(context?: Record<string, any>) {
   const serverOptions: NonNullable<ConstructorParameters<typeof Server>[1]> & {
     protocolVersions?: string[];
   } = {
@@ -78,7 +79,7 @@ function createServer() {
   }, serverOptions);
 
   // Configure server with shared handlers
-  BaseServerHandler.configureServer(srv);
+  BaseServerHandler.configureServer(srv, context);
 
   return srv;
 }
@@ -124,25 +125,36 @@ async function main() {
   // Create event store for resumability
   const eventStore = new InMemoryEventStore();
 
-  // Legacy SSE endpoint - redirect to MCP
-  app.all('/sse', (req: Request, res: Response) => {
-    const redirectInfo = {
-      error: "SSE endpoint deprecated",
-      message: "The /sse endpoint has been removed. Please use the modern /mcp endpoint instead.",
-      migration: {
-        old_endpoint: "/sse",
-        new_endpoint: "/mcp",
-        transport: "MCP Streamable HTTP", 
-        protocol_version: "2025-07-09"
-      },
-      documentation: "https://github.com/marianfoo/mcp-sap-docs#connect-from-your-mcp-client",
-      alternatives: {
-        "Local MCP Streamable HTTP": "http://127.0.0.1:" + variant.server.streamablePort + "/mcp",
-        "Public MCP Streamable HTTP": "https://mcp-sap-docs.marianzeis.de/mcp"
-      }
-    };
+  // Keep track of traditional SSE sessions
+  const sseTransports: { [sessionId: string]: SSEServerTransport } = {};
+
+  // Legacy/Traditional SSE endpoint for clients like supergateway
+  app.get('/sse', async (req: Request, res: Response) => {
+    logger.debug(`Received GET request to /sse`);
+    const sapApiHubKey = req.headers['sap-api-hub-key'] as string | undefined;
     
-    res.status(410).json(redirectInfo);
+    // Create SSEServerTransport with relative path for messages
+    const transport = new SSEServerTransport("/messages", res);
+    const server = createServer({ sapApiHubKey });
+    await server.connect(transport);
+    
+    // Store transport by its sessionId
+    sseTransports[transport.sessionId] = transport;
+    
+    req.on('close', () => {
+      delete sseTransports[transport.sessionId];
+    });
+  });
+
+  app.post('/messages', async (req: Request, res: Response) => {
+    const sessionId = req.query.sessionId as string;
+    const transport = sseTransports[sessionId];
+    if (!transport) {
+      res.status(404).json({ error: "Session not found" });
+      return;
+    }
+    // express.json() already parsed the body, so we pass req.body as parsedBody
+    await transport.handlePostMessage(req, res, req.body);
   });
 
   // Handle all MCP Streamable HTTP requests (GET, POST, DELETE) on a single endpoint
@@ -221,7 +233,8 @@ async function main() {
         };
         
         // Connect the transport to the MCP server
-        const server = createServer();
+        const sapApiHubKey = req.headers['sap-api-hub-key'] as string | undefined;
+        const server = createServer({ sapApiHubKey });
         await server.connect(transport);
         
         logger.logTransportEvent('transport_created', undefined, { 
@@ -250,7 +263,8 @@ async function main() {
           sessionIdGenerator: undefined, // Stateless — no session
         });
 
-        const server = createServer();
+        const sapApiHubKey = req.headers['sap-api-hub-key'] as string | undefined;
+        const server = createServer({ sapApiHubKey });
         await server.connect(transport);
       } else {
         // Invalid request — only non-POST or non-JSON requests reach this branch
