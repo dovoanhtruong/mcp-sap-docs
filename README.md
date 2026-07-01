@@ -6,21 +6,21 @@ A powerful Model Context Protocol (MCP) Server connecting AI assistants (Claude,
 
 ```mermaid
 flowchart LR
-    A[AI Assistant\n(Cursor, Claude, Gemini)] -->|MCP Protocol\n(stdio / SSE)| B(MCP Server\nNodeJS App)
+    A["AI Assistant<br>(Cursor, Claude, Gemini)"] -->|"MCP Protocol<br>(stdio / SSE)"| B("MCP Server<br>NodeJS App")
     
     subgraph Data Sources
-        C[(Offline SQLite\nBM25 + Semantic)]
-        D[SAP Help Portal]
-        E[SAP Accelerator Hub]
-        F[SAP Fiori App Library]
-        G[Clean Core\nReleased Objects]
+        C[("Offline SQLite<br>BM25 + Semantic")]
+        D["SAP Help Portal"]
+        E["SAP Accelerator Hub"]
+        F["SAP Fiori App Library"]
+        G["Clean Core<br>Released Objects"]
     end
 
-    B -->|Search/Fetch| C
-    B -->|Live REST/OData| D
-    B -->|Live REST/OData| E
-    B -->|Live REST/OData| F
-    B -->|Live REST/OData| G
+    B -->|"Search/Fetch"| C
+    B -->|"Live REST/OData"| D
+    B -->|"Live REST/OData"| E
+    B -->|"Live REST/OData"| F
+    B -->|"Live REST/OData"| G
 
     style B fill:#f96,stroke:#333,stroke-width:2px
     style C fill:#9cf,stroke:#333
