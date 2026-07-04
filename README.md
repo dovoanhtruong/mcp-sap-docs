@@ -1,4 +1,10 @@
-# MCP SAP Docs
+# MCP SAP Docs (Extended Edition)
+
+> **Note:** This workspace is an extension rooted from the original repository: [marianfoo/mcp-sap-docs](https://github.com/marianfoo/mcp-sap-docs).
+>
+> **Key Enhancements in this Version:** We have continued development by significantly expanding its capabilities, integrating **two crucial online sources**:
+> 1. 🌟 **SAP Accelerator Hub**: Live access to OData, REST, and SOAP APIs.
+> 2. 🌟 **SAP Fiori App Reference Library**: Detailed insights into standard Fiori Apps and configurations.
 
 A powerful Model Context Protocol (MCP) Server connecting AI assistants (Claude, Cursor, Gemini IDE) to SAP's vast ecosystem via Hybrid Search & Live APIs.
 
